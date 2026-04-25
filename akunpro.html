@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AkunPro — Sistem Akuntansi</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f2ed;
+  --surface:#ffffff;
+  --surface2:#f9f8f5;
+  --surface3:#eeece6;
+  --border:#dedad1;
+  --border2:#cbc7bc;
+  --text:#1a1916;
+  --muted:#7a7669;
+  --muted2:#a09d95;
+  --accent:#1a4f8a;
+  --accent-light:#e8eef6;
+  --debit:#1a4f8a;
+  --kredit:#7a2620;
+  --green:#1e6b45;
+  --green-bg:#eaf4ee;
+  --red:#7a2620;
+  --red-bg:#f9eeec;
+  --amber:#7a5a10;
+  --amber-bg:#fdf5e0;
+  --font:'IBM Plex Sans',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --r:6px;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;line-height:1.55;min-height:100vh}
+
+/* NAV */
+nav{background:var(--text);color:#f4f2ed;padding:0 28px;display:flex;align-items:stretch;gap:0;border-bottom:3px solid var(--accent)}
+.nav-brand{padding:14px 20px 14px 0;font-size:15px;font-weight:600;letter-spacing:.5px;border-right:1px solid rgba(255,255,255,.12);margin-right:6px;white-space:nowrap}
+.nav-brand span{color:#94b8e0;font-weight:300}
+.nav-tab{padding:0 16px;cursor:pointer;font-size:12px;font-weight:500;letter-spacing:.6px;text-transform:uppercase;color:rgba(255,255,255,.5);transition:color .15s;display:flex;align-items:center;border-bottom:3px solid transparent;margin-bottom:-3px}
+.nav-tab:hover{color:rgba(255,255,255,.85)}
+.nav-tab.active{color:#fff;border-bottom-color:#94b8e0}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:6px;padding:8px 0}
+.nav-btn{padding:6px 13px;border-radius:var(--r);border:1px solid rgba(255,255,255,.18);background:transparent;color:rgba(255,255,255,.75);font-family:var(--font);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;letter-spacing:.3px;white-space:nowrap}
+.nav-btn:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.35)}
+.nav-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.nav-btn.primary:hover{background:#15417a}
+
+/* LAYOUT */
+.page{display:none;padding:24px 28px;max-width:1280px;margin:0 auto}
+.page.active{display:block}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:20px}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.card-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
+.card-body{padding:18px}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px}
+.stat-l{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--muted2);margin-bottom:5px}
+.stat-v{font-family:var(--mono);font-size:18px;font-weight:500;letter-spacing:-1px}
+.stat-v.d{color:var(--debit)}.stat-v.k{color:var(--kredit)}.stat-v.g{color:var(--green)}.stat-v.n{color:var(--text)}
+
+/* FORM */
+.form-row{display:grid;gap:10px;margin-bottom:10px}
+.form-row.col2{grid-template-columns:1fr 1fr}
+.form-row.col3{grid-template-columns:1fr 1fr 1fr}
+.form-row.col4{grid-template-columns:140px 1fr 1fr 1fr}
+label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px}
+input,select,textarea{width:100%;padding:8px 10px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);font-family:var(--font);font-size:13px;color:var(--text);transition:border .15s}
+input:focus,select:focus{outline:none;border-color:var(--accent)}
+select option{background:var(--surface)}
+input[type=number]{font-family:var(--mono)}
+.btn{padding:8px 16px;border-radius:var(--r);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--surface3);border-color:var(--border2)}
+.btn-accent{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-accent:hover{background:#15417a;border-color:#15417a}
+.btn-danger{background:var(--red-bg);border-color:#d4a8a5;color:var(--red)}
+.btn-danger:hover{background:#f5e0de}
+.btn-csv{background:var(--amber-bg);border-color:#e0c970;color:var(--amber)}
+.btn-xl{background:var(--green-bg);border-color:#8bc4a5;color:var(--green)}
+
+/* JURNAL ENTRY GROUP */
+.entry-group{border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+.entry-group-header{background:var(--surface2);padding:10px 14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.entry-group-no{font-family:var(--mono);font-size:11px;background:var(--accent-light);color:var(--accent);padding:2px 8px;border-radius:3px;font-weight:500}
+.entry-group-date{font-size:12px;font-weight:500;color:var(--muted)}
+.entry-group-keterangan{font-size:12px;color:var(--text);flex:1}
+.entry-group-del{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--muted2);font-size:14px;padding:2px 6px;border-radius:3px;transition:all .12s}
+.entry-group-del:hover{color:var(--red);background:var(--red-bg)}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead th{padding:9px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);border-bottom:2px solid var(--border);white-space:nowrap;background:var(--surface2)}
+tbody td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--surface2)}
+.td-mono{font-family:var(--mono);font-size:12px}
+.td-debit{color:var(--debit);font-family:var(--mono);font-size:12px;text-align:right}
+.td-kredit{color:var(--kredit);font-family:var(--mono);font-size:12px;text-align:right;padding-left:32px}
+.td-kredit-row td:first-child{padding-left:32px;color:var(--muted)}
+.tbl-footer td{background:var(--surface2);font-weight:600;border-top:2px solid var(--border2);font-family:var(--mono);font-size:12px}
+
+/* BUKU BESAR */
+.bb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px}
+.bb-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.bb-header{background:var(--accent);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
+.bb-akun{font-size:13px;font-weight:600}
+.bb-kode{font-family:var(--mono);font-size:11px;opacity:.75}
+.bb-saldo{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.15);padding:3px 8px;border-radius:3px}
+.bb-tbl table{width:100%}
+.bb-tbl thead th{font-size:10px;background:var(--surface2);padding:6px 10px;border-bottom:1px solid var(--border)}
+.bb-tbl tbody td{padding:7px 10px;font-size:11px;border-bottom:1px solid var(--border)}
+.bb-tbl tbody tr:last-child td{border-bottom:none}
+.bb-tbl .saldo-row td{background:var(--accent-light);font-weight:600;color:var(--accent);font-family:var(--mono);font-size:11px;border-top:1px solid var(--border2)}
+
+/* NERACA SALDO */
+.neraca-table table{width:100%}
+.neraca-table thead th{background:var(--text);color:#f4f2ed;padding:10px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.6px;font-weight:500}
+.neraca-table tbody td{padding:9px 14px;border-bottom:1px solid var(--border);font-size:13px}
+.neraca-table tbody tr:hover td{background:var(--surface2)}
+.neraca-table .subtotal td{background:var(--surface3);font-weight:600;border-top:2px solid var(--border2)}
+.neraca-table .grand-total td{background:var(--text);color:#f4f2ed;font-weight:600;font-family:var(--mono)}
+.check-ok{color:var(--green);font-weight:700;font-size:13px}
+.check-err{color:var(--red);font-weight:700;font-size:13px}
+
+/* AKUN MASTER */
+.akun-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:3px;font-size:11px;font-weight:500;margin:3px;background:var(--surface2);border:1px solid var(--border)}
+.type-A{border-left:3px solid var(--debit)}
+.type-L{border-left:3px solid var(--kredit)}
+.type-E{border-left:3px solid var(--green)}
+.type-P{border-left:3px solid var(--amber)}
+.type-B{border-left:3px solid #7a3d8a}
+
+/* BADGES */
+.badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.badge-A{background:var(--accent-light);color:var(--accent)}
+.badge-L{background:var(--red-bg);color:var(--red)}
+.badge-E{background:var(--green-bg);color:var(--green)}
+.badge-P{background:var(--amber-bg);color:var(--amber)}
+.badge-B{background:#f2e8f5;color:#6a2880}
+
+.empty{text-align:center;padding:40px;color:var(--muted2);font-size:13px}
+.tag-info{display:inline-block;background:var(--accent-light);color:var(--accent);border-radius:3px;padding:2px 7px;font-size:11px;font-weight:500}
+.section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+
+.balance-indicator{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--r);border:1px solid var(--border);background:var(--surface2);margin-bottom:14px}
+.bal-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* NOTIF */
+.notif{position:fixed;bottom:20px;right:20px;background:var(--text);color:#f4f2ed;padding:11px 18px;border-radius:var(--r);font-size:13px;font-weight:500;transform:translateY(60px);opacity:0;transition:all .25s;z-index:999;max-width:320px}
+.notif.show{transform:translateY(0);opacity:1}
+
+@media(max-width:800px){.stats-row{grid-template-columns:1fr 1fr}.form-row.col4{grid-template-columns:1fr 1fr}.bb-grid{grid-template-columns:1fr}nav{overflow-x:auto}.page{padding:16px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Akun<span>Pro</span></div>
+  <div class="nav-tab active" onclick="gotoPage('jurnal',this)">Jurnal Umum</div>
+  <div class="nav-tab" onclick="gotoPage('buku',this)">Buku Besar</div>
+  <div class="nav-tab" onclick="gotoPage('neraca',this)">Neraca Saldo</div>
+  <div class="nav-tab" onclick="gotoPage('akun',this)">Daftar Akun</div>
+  <div class="nav-right">
+    <button class="nav-btn btn-csv" onclick="exportCSV()">↓ CSV</button>
+    <button class="nav-btn btn-excel" onclick="exportExcel()">↓ Excel</button>
+    <button class="nav-btn danger" onclick="resetData()" style="color:#f4a49f">✕ Reset</button>
+  </div>
+</nav>
+
+<!-- ====== JURNAL UMUM ====== -->
+<div class="page active" id="page-jurnal">
+  <div class="stats-row" id="jurnal-stats"></div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Input Jurnal Umum</span>
+      <span class="tag-info" id="jurnal-no-preview">JU-0001</span>
+    </div>
+    <div class="card-body">
+      <div class="form-row col3">
+        <div><label>Tanggal</label><input type="date" id="j-date"></div>
+        <div><label>No. Referensi</label><input type="text" id="j-ref" placeholder="Otomatis jika kosong"></div>
+        <div><label>Keterangan Transaksi</label><input type="text" id="j-ket" placeholder="Contoh: Pembelian perlengkapan kantor"></div>
+      </div>
+
+      <div style="margin-top:10px">
+        <div class="section-title">Entri Debit & Kredit</div>
+        <div id="entry-lines"></div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn" onclick="addLine('debit')">+ Baris Debit</button>
+          <button class="btn" onclick="addLine('kredit')">+ Baris Kredit</button>
+        </div>
+      </div>
+
+      <div id="balance-check" class="balance-indicator" style="margin-top:14px">
+        <div class="bal-dot" style="background:var(--muted2)"></div>
+        <span style="font-size:12px;color:var(--muted)">Tambahkan baris debit dan kredit, jumlah harus seimbang.</span>
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn" onclick="clearForm()">Bersihkan</button>
+        <button class="btn btn-accent" onclick="simpanJurnal()">Simpan ke Jurnal</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Daftar Jurnal</span>
+      <div style="display:flex;gap:6px">
+        <input type="text" id="jurnal-search" placeholder="Cari..." style="width:180px;padding:5px 10px;font-size:12px" oninput="renderJurnal()">
+      </div>
+    </div>
+    <div class="tbl-wrap" id="jurnal-list"></div>
+  </div>
+</div>
+
+<!-- ====== BUKU BESAR ====== -->
+<div class="page" id="page-buku">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+    <div>
+      <div style="font-size:15px;font-weight:600">Buku Besar</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Ringkasan semua transaksi per akun</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <select id="bb-filter" style="font-size:12px;padding:6px 10px;width:auto" onchange="renderBukuBesar()">
+        <option value="">Semua Tipe Akun</option>
+        <option value="A">Aset</option>
+        <option value="L">Liabilitas</option>
+        <option value="E">Ekuitas</option>
+        <option value="P">Pendapatan</option>
+        <option value="B">Beban</option>
+      </select>
+    </div>
+  </div>
+  <div class="bb-grid" id="buku-besar-grid"></div>
+</div>
+
+<!-- ====== NERACA SALDO ====== -->
+<div class="page" id="page-neraca">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+    <div>
+      <div style="font-size:15px;font-weight:600">Neraca Saldo</div>
+      <div style="font-size:12px;color:var(--muted)">Trial Balance — semua akun dengan saldo debit/kredit</div>
+    </div>
+  </div>
+  <div id="neraca-check-banner" style="margin-bottom:14px"></div>
+  <div class="card neraca-table">
+    <div class="tbl-wrap" id="neraca-table"></div>
+  </div>
+</div>
+
+<!-- ====== DAFTAR AKUN ====== -->
+<div class="page" id="page-akun">
+  <div class="card" style="max-width:700px">
+    <div class="card-header"><span class="card-title">Tambah Akun Baru</span></div>
+    <div class="card-body">
+      <div class="form-row col4">
+        <div><label>Kode Akun</label><input type="text" id="a-kode" placeholder="1-001"></div>
+        <div><label>Nama Akun</label><input type="text" id="a-nama" placeholder="Kas"></div>
+        <div><label>Tipe Akun</label>
+          <select id="a-tipe">
+            <option value="A">Aset (Debit+)</option>
+            <option value="L">Liabilitas (Kredit+)</option>
+            <option value="E">Ekuitas (Kredit+)</option>
+            <option value="P">Pendapatan (Kredit+)</option>
+            <option value="B">Beban (Debit+)</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:flex-end"><button class="btn btn-accent" style="width:100%;justify-content:center" onclick="tambahAkun()">Tambah</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">Daftar Akun</span></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Kode</th><th>Nama Akun</th><th>Tipe</th><th>Normal Saldo</th><th></th></tr></thead>
+        <tbody id="akun-tbl"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const TIPE_LABEL = {A:'Aset',L:'Liabilitas',E:'Ekuitas',P:'Pendapatan',B:'Beban'};
+const TIPE_NORMAL = {A:'Debit',L:'Kredit',E:'Kredit',P:'Kredit',B:'Debit'};
+
+let daftarAkun = JSON.parse(localStorage.getItem('ap_akun') || 'null') || [
+  {kode:'1-100',nama:'Kas',tipe:'A'},
+  {kode:'1-200',nama:'Piutang Usaha',tipe:'A'},
+  {kode:'1-300',nama:'Perlengkapan',tipe:'A'},
+  {kode:'1-400',nama:'Peralatan',tipe:'A'},
+  {kode:'1-500',nama:'Akumulasi Penyusutan Peralatan',tipe:'L'},
+  {kode:'2-100',nama:'Hutang Usaha',tipe:'L'},
+  {kode:'2-200',nama:'Hutang Bank',tipe:'L'},
+  {kode:'3-100',nama:'Modal Pemilik',tipe:'E'},
+  {kode:'3-200',nama:'Prive Pemilik',tipe:'B'},
+  {kode:'4-100',nama:'Pendapatan Jasa',tipe:'P'},
+  {kode:'4-200',nama:'Pendapatan Lain-lain',tipe:'P'},
+  {kode:'5-100',nama:'Beban Gaji',tipe:'B'},
+  {kode:'5-200',nama:'Beban Sewa',tipe:'B'},
+  {kode:'5-300',nama:'Beban Utilitas',tipe:'B'},
+  {kode:'5-400',nama:'Beban Perlengkapan',tipe:'B'},
+];
+
+let jurnal = JSON.parse(localStorage.getItem('ap_jurnal') || '[]');
+let lineId = 0;
+let currentLines = [];
+
+function save() {
+  localStorage.setItem('ap_akun', JSON.stringify(daftarAkun));
+  localStorage.setItem('ap_jurnal', JSON.stringify(jurnal));
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function gotoPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  el.classList.add('active');
+  if (id === 'buku') renderBukuBesar();
+  if (id === 'neraca') renderNeraca();
+  if (id === 'akun') renderAkunTbl();
+  if (id === 'jurnal') { renderJurnal(); renderStats(); }
+}
+
+// ============================================================
+// FORMAT
+// ============================================================
+function fmtRp(n) {
+  if (!n && n !== 0) return '-';
+  return n === 0 ? '-' : n.toLocaleString('id-ID');
+}
+function fmtDate(d) {
+  if (!d) return '';
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'});
+}
+function nextNo() {
+  const n = jurnal.length + 1;
+  return 'JU-' + String(n).padStart(4, '0');
+}
+function getAkun(kode) { return daftarAkun.find(a => a.kode === kode); }
+
+// ============================================================
+// FORM — LINES
+// ============================================================
+function addLine(type) {
+  const id = ++lineId;
+  currentLines.push({ id, type, akun: '', nominal: 0 });
+  renderLines();
+}
+
+function removeLine(id) {
+  currentLines = currentLines.filter(l => l.id !== id);
+  renderLines();
+}
+
+function renderLines() {
+  const wrap = document.getElementById('entry-lines');
+  if (!currentLines.length) {
+    wrap.innerHTML = '<div style="color:var(--muted2);font-size:12px;padding:8px 0">Klik tombol di bawah untuk menambah baris.</div>';
+    updateBalanceCheck();
+    return;
+  }
+  const akunOpts = daftarAkun.map(a => `<option value="${a.kode}">${a.kode} — ${a.nama}</option>`).join('');
+  wrap.innerHTML = currentLines.map(l => `
+    <div style="display:grid;grid-template-columns:90px 1fr 160px 32px;gap:8px;margin-bottom:6px;align-items:center">
+      <div>
+        <span style="display:inline-block;padding:3px 8px;border-radius:3px;font-size:11px;font-weight:600;background:${l.type==='debit'?'var(--accent-light)':'var(--red-bg)'};color:${l.type==='debit'?'var(--debit)':'var(--kredit)'}">${l.type==='debit'?'DEBIT':'KREDIT'}</span>
+      </div>
+      <select onchange="updateLine(${l.id},'akun',this.value)" style="${l.type==='kredit'?'margin-left:24px':''}">
+        <option value="">— Pilih Akun —</option>
+        ${akunOpts}
+      </select>
+      <input type="number" min="0" placeholder="Nominal" value="${l.nominal||''}"
+        style="font-family:var(--mono);text-align:right"
+        onchange="updateLine(${l.id},'nominal',parseFloat(this.value)||0)">
+      <button onclick="removeLine(${l.id})" style="background:none;border:none;cursor:pointer;color:var(--muted2);font-size:16px;line-height:1;padding:0 4px" title="Hapus">×</button>
+    </div>
+  `).join('');
+
+  // restore selections
+  currentLines.forEach(l => {
+    const selects = wrap.querySelectorAll('select');
+    // find by position
+    const idx = currentLines.indexOf(l);
+    if (selects[idx]) selects[idx].value = l.akun;
+  });
+  updateBalanceCheck();
+}
+
+function updateLine(id, field, val) {
+  const l = currentLines.find(l => l.id === id);
+  if (l) l[field] = val;
+  updateBalanceCheck();
+}
+
+function updateBalanceCheck() {
+  const totalD = currentLines.filter(l=>l.type==='debit').reduce((s,l)=>s+(parseFloat(l.nominal)||0),0);
+  const totalK = currentLines.filter(l=>l.type==='kredit').reduce((s,l)=>s+(parseFloat(l.nominal)||0),0);
+  const el = document.getElementById('balance-check');
+  const dot = el.querySelector('.bal-dot');
+  if (!currentLines.length) {
+    dot.style.background='var(--muted2)';
+    el.querySelector('span').innerHTML='Tambahkan baris debit dan kredit, jumlah harus seimbang.';
+    return;
+  }
+  if (totalD === 0 && totalK === 0) { dot.style.background='var(--muted2)'; el.querySelector('span').innerHTML='Masukkan nominal.'; return; }
+  if (totalD === totalK && totalD > 0) {
+    dot.style.background='var(--green)';
+    el.querySelector('span').innerHTML=`<strong style="color:var(--green)">Seimbang ✓</strong> &nbsp; Debit = Kredit = <span style="font-family:var(--mono)">Rp ${fmtRp(totalD)}</span>`;
+  } else {
+    dot.style.background='var(--red)';
+    el.querySelector('span').innerHTML=`<strong style="color:var(--red)">Tidak Seimbang ✗</strong> &nbsp; Debit: <span style="font-family:var(--mono)">Rp ${fmtRp(totalD)}</span> | Kredit: <span style="font-family:var(--mono)">Rp ${fmtRp(totalK)}</span> | Selisih: <span style="font-family:var(--mono)">Rp ${fmtRp(Math.abs(totalD-totalK))}</span>`;
+  }
+}
+
+// ============================================================
+// SIMPAN JURNAL
+// ============================================================
+function simpanJurnal() {
+  const date = document.getElementById('j-date').value;
+  const ket = document.getElementById('j-ket').value.trim();
+  const ref = document.getElementById('j-ref').value.trim() || nextNo();
+
+  if (!date) { showNotif('Pilih tanggal!'); return; }
+  if (!ket) { showNotif('Isi keterangan transaksi!'); return; }
+  if (!currentLines.length) { showNotif('Tambahkan baris debit/kredit!'); return; }
+  if (currentLines.some(l => !l.akun)) { showNotif('Pilih akun untuk semua baris!'); return; }
+
+  const totalD = currentLines.filter(l=>l.type==='debit').reduce((s,l)=>s+l.nominal,0);
+  const totalK = currentLines.filter(l=>l.type==='kredit').reduce((s,l)=>s+l.nominal,0);
+  if (totalD !== totalK || totalD === 0) { showNotif('Debit dan Kredit harus seimbang!'); return; }
+
+  jurnal.push({ no: ref, date, ket, lines: JSON.parse(JSON.stringify(currentLines)) });
+  save();
+  clearForm();
+  renderJurnal();
+  renderStats();
+  showNotif('✓ Jurnal berhasil disimpan!');
+  document.getElementById('jurnal-no-preview').textContent = nextNo();
+}
+
+function clearForm() {
+  currentLines = [];
+  lineId = 0;
+  document.getElementById('j-ket').value = '';
+  document.getElementById('j-ref').value = '';
+  renderLines();
+}
+
+function hapusJurnal(idx) {
+  if (!confirm('Hapus jurnal ini?')) return;
+  jurnal.splice(idx, 1);
+  save();
+  renderJurnal();
+  renderStats();
+  renderBukuBesar();
+  renderNeraca();
+  showNotif('✓ Jurnal dihapus.');
+}
+
+// ============================================================
+// RENDER JURNAL
+// ============================================================
+function renderJurnal() {
+  const wrap = document.getElementById('jurnal-list');
+  const q = (document.getElementById('jurnal-search')?.value || '').toLowerCase();
+  const filtered = jurnal.map((j,i)=>({...j,_idx:i})).filter(j =>
+    !q || j.no.toLowerCase().includes(q) || j.ket.toLowerCase().includes(q)
+  ).reverse();
+
+  if (!filtered.length) {
+    wrap.innerHTML = '<div class="empty">Belum ada jurnal. Isi form di atas untuk mencatat transaksi.</div>';
+    return;
+  }
+
+  const rows = filtered.map(j => {
+    const lineRows = j.lines.map((l,li) => {
+      const akun = getAkun(l.akun);
+      const nm = akun ? akun.nama : l.akun;
+      const isKredit = l.type === 'kredit';
+      return `<tr class="${isKredit?'td-kredit-row':''}">
+        <td style="padding:6px 12px;font-size:12px;color:var(--muted)"></td>
+        <td style="padding:6px 12px;font-size:12px;color:var(--muted2)">${l.akun}</td>
+        <td style="padding:6px 12px;font-size:12px;${isKredit?'padding-left:28px;color:var(--muted)':''}">${nm}${isKredit?' (K)':' (D)'}</td>
+        <td class="td-debit" style="padding:6px 12px">${!isKredit ? fmtRp(l.nominal) : ''}</td>
+        <td class="td-kredit" style="padding:6px 12px">${isKredit ? fmtRp(l.nominal) : ''}</td>
+      </tr>`;
+    }).join('');
+    const total = j.lines.filter(l=>l.type==='debit').reduce((s,l)=>s+l.nominal,0);
+    return `
+      <tr style="background:var(--surface2)">
+        <td style="padding:9px 12px"><span class="entry-group-no">${j.no}</span></td>
+        <td style="padding:9px 12px;font-size:12px;color:var(--muted)">${fmtDate(j.date)}</td>
+        <td colspan="2" style="padding:9px 12px;font-size:13px;font-weight:500">${j.ket}</td>
+        <td style="padding:9px 12px;text-align:right">
+          <button class="btn btn-danger" style="padding:3px 8px;font-size:11px" onclick="hapusJurnal(${j._idx})">Hapus</button>
+        </td>
+      </tr>
+      ${lineRows}
+      <tr style="background:var(--surface3);border-top:1px solid var(--border)">
+        <td colspan="3" style="padding:5px 12px;font-size:11px;color:var(--muted2)">Total</td>
+        <td style="padding:5px 12px;font-family:var(--mono);font-size:11px;font-weight:600;text-align:right;color:var(--debit)">${fmtRp(total)}</td>
+        <td style="padding:5px 12px;font-family:var(--mono);font-size:11px;font-weight:600;text-align:right;color:var(--kredit)">${fmtRp(total)}</td>
+      </tr>`;
+  }).join('');
+
+  wrap.innerHTML = `<table>
+    <thead><tr>
+      <th style="width:90px">No. Jurnal</th><th style="width:110px">Tanggal</th>
+      <th>Keterangan / Akun</th>
+      <th style="text-align:right;width:150px">Debit (Rp)</th>
+      <th style="text-align:right;width:150px">Kredit (Rp)</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+  document.getElementById('jurnal-no-preview').textContent = nextNo();
+}
+
+function renderStats() {
+  const totalD = jurnal.reduce((s,j)=>s+j.lines.filter(l=>l.type==='debit').reduce((ss,l)=>ss+l.nominal,0),0);
+  const count = jurnal.length;
+  const akunSet = new Set(jurnal.flatMap(j=>j.lines.map(l=>l.akun)));
+  document.getElementById('jurnal-stats').innerHTML = `
+    <div class="stat"><div class="stat-l">Total Jurnal</div><div class="stat-v n">${count}</div></div>
+    <div class="stat"><div class="stat-l">Total Debit</div><div class="stat-v d">Rp ${fmtRp(totalD)}</div></div>
+    <div class="stat"><div class="stat-l">Total Kredit</div><div class="stat-v k">Rp ${fmtRp(totalD)}</div></div>
+    <div class="stat"><div class="stat-l">Akun Digunakan</div><div class="stat-v n">${akunSet.size}</div></div>`;
+}
+
+// ============================================================
+// BUKU BESAR
+// ============================================================
+function getSaldo(kode) {
+  const akun = getAkun(kode);
+  if (!akun) return { debit:0, kredit:0, saldo:0, entries:[] };
+  const entries = [];
+  jurnal.forEach(j => {
+    j.lines.filter(l=>l.akun===kode).forEach(l => {
+      entries.push({ date:j.date, no:j.no, ket:j.ket, type:l.type, nominal:l.nominal });
+    });
+  });
+  entries.sort((a,b)=>a.date.localeCompare(b.date));
+  const totalD = entries.filter(e=>e.type==='debit').reduce((s,e)=>s+e.nominal,0);
+  const totalK = entries.filter(e=>e.type==='kredit').reduce((s,e)=>s+e.nominal,0);
+  let saldo;
+  if (TIPE_NORMAL[akun.tipe] === 'Debit') saldo = totalD - totalK;
+  else saldo = totalK - totalD;
+
+  // running saldo
+  let running = 0;
+  entries.forEach(e => {
+    if (TIPE_NORMAL[akun.tipe] === 'Debit') {
+      running += (e.type==='debit'?1:-1)*e.nominal;
+    } else {
+      running += (e.type==='kredit'?1:-1)*e.nominal;
+    }
+    e.saldo = running;
+  });
+  return { debit:totalD, kredit:totalK, saldo, entries };
+}
+
+function renderBukuBesar() {
+  const filter = document.getElementById('bb-filter')?.value || '';
+  const wrap = document.getElementById('buku-besar-grid');
+  const akunToShow = daftarAkun.filter(a => !filter || a.tipe === filter);
+  const withTxn = akunToShow.filter(a => getSaldo(a.kode).entries.length > 0);
+
+  if (!withTxn.length) {
+    wrap.innerHTML = '<div class="empty" style="grid-column:1/-1">Belum ada transaksi. Catat jurnal terlebih dahulu.</div>';
+    return;
+  }
+
+  wrap.innerHTML = withTxn.map(a => {
+    const s = getSaldo(a.kode);
+    const rows = s.entries.map(e => `<tr>
+      <td>${fmtDate(e.date)}</td>
+      <td style="color:var(--muted);font-size:10px">${e.no}</td>
+      <td style="font-size:11px">${e.ket}</td>
+      <td style="font-family:var(--mono);text-align:right;color:var(--debit)">${e.type==='debit'?fmtRp(e.nominal):''}</td>
+      <td style="font-family:var(--mono);text-align:right;color:var(--kredit)">${e.type==='kredit'?fmtRp(e.nominal):''}</td>
+      <td style="font-family:var(--mono);text-align:right;color:${e.saldo>=0?'var(--debit)':'var(--kredit)'}">${fmtRp(Math.abs(e.saldo))}</td>
+    </tr>`).join('');
+    const saldoColor = s.saldo >= 0 ? '#fff' : '#ffd4d4';
+    return `<div class="bb-card">
+      <div class="bb-header">
+        <div>
+          <div class="bb-akun">${a.nama}</div>
+          <div class="bb-kode">${a.kode} — ${TIPE_LABEL[a.tipe]}</div>
+        </div>
+        <div class="bb-saldo" style="background:rgba(255,255,255,.2);color:${saldoColor}">Saldo: ${fmtRp(Math.abs(s.saldo))}</div>
+      </div>
+      <div class="bb-tbl">
+        <table>
+          <thead><tr><th>Tgl</th><th>No</th><th>Keterangan</th><th style="text-align:right">Debit</th><th style="text-align:right">Kredit</th><th style="text-align:right">Saldo</th></tr></thead>
+          <tbody>
+            ${rows}
+            <tr class="saldo-row">
+              <td colspan="3" style="font-weight:600">Total</td>
+              <td style="text-align:right">${fmtRp(s.debit)}</td>
+              <td style="text-align:right">${fmtRp(s.kredit)}</td>
+              <td style="text-align:right">${fmtRp(Math.abs(s.saldo))} ${TIPE_NORMAL[a.tipe]}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// NERACA SALDO
+// ============================================================
+function renderNeraca() {
+  const wrap = document.getElementById('neraca-table');
+  const banner = document.getElementById('neraca-check-banner');
+
+  const akunWithTxn = daftarAkun.map(a => {
+    const s = getSaldo(a.kode);
+    return { ...a, ...s };
+  }).filter(a => a.debit > 0 || a.kredit > 0);
+
+  if (!akunWithTxn.length) {
+    wrap.innerHTML = '<div class="empty">Belum ada data. Catat jurnal terlebih dahulu.</div>';
+    banner.innerHTML = '';
+    return;
+  }
+
+  const totalD = akunWithTxn.reduce((s,a) => s + (TIPE_NORMAL[a.tipe]==='Debit' && a.saldo>0 ? a.saldo : (TIPE_NORMAL[a.tipe]==='Kredit' && a.saldo<0 ? Math.abs(a.saldo) : 0)), 0);
+  const totalK = akunWithTxn.reduce((s,a) => s + (TIPE_NORMAL[a.tipe]==='Kredit' && a.saldo>0 ? a.saldo : (TIPE_NORMAL[a.tipe]==='Debit' && a.saldo<0 ? Math.abs(a.saldo) : 0)), 0);
+
+  const balanced = totalD === totalK;
+  banner.innerHTML = `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:var(--r);border:1px solid ${balanced?'#8bc4a5':'#d4a8a5'};background:${balanced?'var(--green-bg)':'var(--red-bg)'};margin-bottom:0">
+    <span style="font-size:18px">${balanced?'✓':'✗'}</span>
+    <div>
+      <div style="font-weight:600;font-size:13px;color:${balanced?'var(--green)':'var(--red)'}">${balanced?'Neraca Seimbang':'Neraca Tidak Seimbang'}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Total Debit: <span style="font-family:var(--mono)">Rp ${fmtRp(totalD)}</span> &nbsp;|&nbsp; Total Kredit: <span style="font-family:var(--mono)">Rp ${fmtRp(totalK)}</span>${!balanced?` &nbsp;|&nbsp; Selisih: <span style="font-family:var(--mono);color:var(--red)">Rp ${fmtRp(Math.abs(totalD-totalK))}</span>`:''}</div>
+    </div>
+  </div>`;
+
+  const tipeOrder = ['A','L','E','P','B'];
+  let rows = '';
+  let runD = 0, runK = 0;
+  tipeOrder.forEach(tipe => {
+    const group = akunWithTxn.filter(a=>a.tipe===tipe);
+    if (!group.length) return;
+    rows += `<tr><td colspan="5" style="background:var(--surface3);padding:7px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">${TIPE_LABEL[tipe]}</td></tr>`;
+    group.sort((a,b)=>a.kode.localeCompare(b.kode)).forEach(a => {
+      const isDebit = TIPE_NORMAL[a.tipe]==='Debit';
+      const salD = isDebit && a.saldo>0 ? a.saldo : (!isDebit && a.saldo<0 ? Math.abs(a.saldo) : 0);
+      const salK = !isDebit && a.saldo>0 ? a.saldo : (isDebit && a.saldo<0 ? Math.abs(a.saldo) : 0);
+      runD += salD; runK += salK;
+      const badge = `<span class="badge badge-${a.tipe}">${TIPE_LABEL[a.tipe]}</span>`;
+      rows += `<tr>
+        <td style="font-family:var(--mono);font-size:12px;color:var(--muted)">${a.kode}</td>
+        <td>${a.nama}</td>
+        <td style="text-align:center">${badge}</td>
+        <td style="font-family:var(--mono);text-align:right;color:var(--debit)">${salD>0?fmtRp(salD):''}</td>
+        <td style="font-family:var(--mono);text-align:right;color:var(--kredit)">${salK>0?fmtRp(salK):''}</td>
+      </tr>`;
+    });
+  });
+
+  wrap.innerHTML = `<table>
+    <thead><tr>
+      <th style="width:90px">Kode Akun</th>
+      <th>Nama Akun</th>
+      <th style="text-align:center;width:100px">Tipe</th>
+      <th style="text-align:right;width:160px">Debit (Rp)</th>
+      <th style="text-align:right;width:160px">Kredit (Rp)</th>
+    </tr></thead>
+    <tbody>
+      ${rows}
+      <tr class="grand-total">
+        <td colspan="3" style="padding:10px 14px">JUMLAH TOTAL</td>
+        <td style="text-align:right;padding:10px 14px">${fmtRp(runD)}</td>
+        <td style="text-align:right;padding:10px 14px">${fmtRp(runK)}</td>
+      </tr>
+    </tbody>
+  </table>`;
+}
+
+// ============================================================
+// DAFTAR AKUN
+// ============================================================
+function tambahAkun() {
+  const kode = document.getElementById('a-kode').value.trim();
+  const nama = document.getElementById('a-nama').value.trim();
+  const tipe = document.getElementById('a-tipe').value;
+  if (!kode||!nama) { showNotif('Isi kode dan nama akun!'); return; }
+  if (daftarAkun.find(a=>a.kode===kode)) { showNotif('Kode akun sudah ada!'); return; }
+  daftarAkun.push({kode,nama,tipe});
+  daftarAkun.sort((a,b)=>a.kode.localeCompare(b.kode));
+  save();
+  renderAkunTbl();
+  document.getElementById('a-kode').value='';
+  document.getElementById('a-nama').value='';
+  showNotif('✓ Akun berhasil ditambahkan!');
+}
+
+function hapusAkun(kode) {
+  const used = jurnal.some(j=>j.lines.some(l=>l.akun===kode));
+  if (used) { showNotif('Akun digunakan dalam jurnal, tidak bisa dihapus!'); return; }
+  if (!confirm('Hapus akun ini?')) return;
+  daftarAkun = daftarAkun.filter(a=>a.kode!==kode);
+  save(); renderAkunTbl(); showNotif('✓ Akun dihapus.');
+}
+
+function renderAkunTbl() {
+  const tbody = document.getElementById('akun-tbl');
+  tbody.innerHTML = daftarAkun.map(a => `<tr>
+    <td style="font-family:var(--mono);font-size:12px">${a.kode}</td>
+    <td>${a.nama}</td>
+    <td><span class="badge badge-${a.tipe}">${TIPE_LABEL[a.tipe]}</span></td>
+    <td style="color:${TIPE_NORMAL[a.tipe]==='Debit'?'var(--debit)':'var(--kredit)'};font-size:12px;font-weight:500">${TIPE_NORMAL[a.tipe]}</td>
+    <td><button class="btn btn-danger" style="padding:3px 8px;font-size:11px" onclick="hapusAkun('${a.kode}')">Hapus</button></td>
+  </tr>`).join('');
+}
+
+// ============================================================
+// EXPORT
+// ============================================================
+function exportCSV() {
+  if (!jurnal.length) { showNotif('Tidak ada data jurnal!'); return; }
+  let csv = '\uFEFFAkunPro — Laporan Jurnal Umum\n';
+  csv += `Diekspor: ${new Date().toLocaleDateString('id-ID')}\n\n`;
+  csv += 'No Jurnal,Tanggal,Keterangan,Kode Akun,Nama Akun,Tipe,Debit (Rp),Kredit (Rp)\n';
+  jurnal.forEach(j => {
+    j.lines.forEach(l => {
+      const akun = getAkun(l.akun);
+      csv += `"${j.no}","${j.date}","${j.ket}","${l.akun}","${akun?akun.nama:l.akun}","${l.type==='debit'?'Debit':'Kredit'}","${l.type==='debit'?l.nominal:''}","${l.type==='kredit'?l.nominal:''}"\n`;
+    });
+    csv += `,,,,,,${j.lines.filter(l=>l.type==='debit').reduce((s,l)=>s+l.nominal,0)},${j.lines.filter(l=>l.type==='kredit').reduce((s,l)=>s+l.nominal,0)}\n`;
+  });
+
+  csv += '\n\nNeraca Saldo\n';
+  csv += 'Kode Akun,Nama Akun,Tipe,Debit (Rp),Kredit (Rp)\n';
+  daftarAkun.forEach(a => {
+    const s = getSaldo(a.kode);
+    if (s.debit > 0 || s.kredit > 0) {
+      const isD = TIPE_NORMAL[a.tipe]==='Debit';
+      const salD = isD&&s.saldo>0?s.saldo:0;
+      const salK = !isD&&s.saldo>0?s.saldo:0;
+      csv += `"${a.kode}","${a.nama}","${TIPE_LABEL[a.tipe]}","${salD||''}","${salK||''}"\n`;
+    }
+  });
+
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=`akunpro_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  showNotif('✓ File CSV berhasil diunduh!');
+}
+
+function exportExcel() {
+  if (!jurnal.length) { showNotif('Tidak ada data jurnal!'); return; }
+  
+  let jurnalRows = '';
+  jurnal.forEach(j => {
+    j.lines.forEach((l,i) => {
+      const akun = getAkun(l.akun);
+      const isFirst = i===0;
+      jurnalRows += `<tr>
+        <td>${isFirst?j.no:''}</td>
+        <td>${isFirst?j.date:''}</td>
+        <td style="${l.type==='kredit'?'padding-left:24px;color:#666':''}">${isFirst?j.ket:''}</td>
+        <td style="font-family:Courier New">${l.akun}</td>
+        <td style="${l.type==='kredit'?'padding-left:20px;color:#555':''}">${akun?akun.nama:l.akun}</td>
+        <td style="text-align:right;font-family:Courier New;color:${l.type==='debit'?'#1a4f8a':'white'}">${l.type==='debit'?l.nominal.toLocaleString('id-ID'):''}</td>
+        <td style="text-align:right;font-family:Courier New;color:${l.type==='kredit'?'#7a2620':'white'}">${l.type==='kredit'?l.nominal.toLocaleString('id-ID'):''}</td>
+      </tr>`;
+    });
+    const total = j.lines.filter(l=>l.type==='debit').reduce((s,l)=>s+l.nominal,0);
+    jurnalRows += `<tr style="background:#f5f3ee;font-weight:bold">
+      <td colspan="5" style="font-size:10pt;color:#888;padding-left:8px">Jumlah</td>
+      <td style="text-align:right;font-family:Courier New">${total.toLocaleString('id-ID')}</td>
+      <td style="text-align:right;font-family:Courier New">${total.toLocaleString('id-ID')}</td>
+    </tr>`;
+  });
+
+  let neracaRows = '';
+  let totD=0,totK=0;
+  const tipeOrder=['A','L','E','P','B'];
+  tipeOrder.forEach(tipe => {
+    const group = daftarAkun.filter(a=>a.tipe===tipe).map(a=>({...a,...getSaldo(a.kode)})).filter(a=>a.debit>0||a.kredit>0);
+    if (!group.length) return;
+    neracaRows += `<tr><td colspan="5" style="background:#2c3e50;color:white;font-weight:bold;padding:6px 10px">${TIPE_LABEL[tipe]}</td></tr>`;
+    group.forEach(a=>{
+      const isD=TIPE_NORMAL[a.tipe]==='Debit';
+      const salD=isD&&a.saldo>0?a.saldo:(!isD&&a.saldo<0?Math.abs(a.saldo):0);
+      const salK=!isD&&a.saldo>0?a.saldo:(isD&&a.saldo<0?Math.abs(a.saldo):0);
+      totD+=salD;totK+=salK;
+      neracaRows+=`<tr><td style="font-family:Courier New">${a.kode}</td><td>${a.nama}</td><td>${TIPE_LABEL[a.tipe]}</td>
+        <td style="text-align:right;font-family:Courier New;color:#1a4f8a">${salD>0?salD.toLocaleString('id-ID'):''}</td>
+        <td style="text-align:right;font-family:Courier New;color:#7a2620">${salK>0?salK.toLocaleString('id-ID'):''}</td></tr>`;
+    });
+  });
+
+  const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
+<head><meta charset="UTF-8">
+<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets>
+<x:ExcelWorksheet><x:Name>Jurnal Umum</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
+</x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+<style>body{font-family:Arial;font-size:10pt}table{border-collapse:collapse;width:100%}
+th{background:#1a2535;color:#fff;padding:7px 10px;text-align:left}
+td{padding:5px 10px;border-bottom:1px solid #e0ddd5}
+tr:nth-child(even) td{background:#fafaf7}
+h2{color:#1a2535;margin-bottom:2px}h3{color:#1a4f8a;margin:20px 0 8px}
+.meta{color:#888;font-size:9pt;margin-bottom:14px}
+.grand-total td{background:#1a2535;color:#fff;font-weight:bold;padding:8px 10px}</style>
+</head><body>
+<h2>AkunPro — Laporan Akuntansi</h2>
+<div class="meta">Diekspor: ${new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
+<h3>Jurnal Umum</h3>
+<table><thead><tr><th>No Jurnal</th><th>Tanggal</th><th>Keterangan</th><th>Kode Akun</th><th>Nama Akun</th><th style="text-align:right">Debit (Rp)</th><th style="text-align:right">Kredit (Rp)</th></tr></thead>
+<tbody>${jurnalRows}</tbody></table>
+<h3>Neraca Saldo (Trial Balance)</h3>
+<table><thead><tr><th>Kode Akun</th><th>Nama Akun</th><th>Tipe</th><th style="text-align:right">Debit (Rp)</th><th style="text-align:right">Kredit (Rp)</th></tr></thead>
+<tbody>${neracaRows}
+<tr class="grand-total"><td colspan="3">JUMLAH TOTAL</td><td style="text-align:right">${totD.toLocaleString('id-ID')}</td><td style="text-align:right">${totK.toLocaleString('id-ID')}</td></tr>
+</tbody></table>
+</body></html>`;
+
+  const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`akunpro_${new Date().toISOString().slice(0,10)}.xls`;a.click();
+  URL.revokeObjectURL(url);
+  showNotif('✓ File Excel berhasil diunduh!');
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function resetData() {
+  if (!confirm('Reset semua data jurnal? Daftar akun tetap tersimpan.')) return;
+  jurnal = [];
+  save();
+  renderJurnal(); renderStats();
+  showNotif('✓ Data jurnal direset.');
+}
+
+function showNotif(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2800);
+}
+
+// INIT
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('j-date').value = today;
+renderLines();
+renderJurnal();
+renderStats();
+renderAkunTbl();
+</script>
+</body>
+</html>
